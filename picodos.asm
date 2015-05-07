@@ -185,9 +185,7 @@ os_main:
 	include "kernel/ports.asm"	    ; Port functions
 	include "kernel/math.asm"	    ; Math functions
 	include "kernel/string.asm"	    ; String functions
-	;include "kernel/Functions.inc" ; Functions include files
 	include "kernel/vfs.asm"	    ; Virtual Filesystem
-	;include "kernel/fat.asm"	    ; Fat include files
 	include "kernel/misc.asm"	    ; Misc functions
 	include "kernel/memory.asm"	    ; Memory functions
 
@@ -202,7 +200,8 @@ os_main:
 	SaveCS		dw 0
 
 	;KRNL_SEG	dw 0050h
-	;COM_LOAD	dw 0060h
+	COM_LOAD	dw 1060h			; We Load COM/EXE at this segment, 67K from memory start.
+									; the Kernel is loaded before this.
 
 	include "kernel/Data.inc"	    ; Data include files
 
