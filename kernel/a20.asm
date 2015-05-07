@@ -36,3 +36,15 @@ os_disable_a20:
 	int 15h
 	pop ax
 	ret
+
+; ==================================================================
+; os_status_a20 - Check A20 Gate Status
+;
+; IN: Nothing
+;
+; OUT: AL = 00h disabled, 01h enabled
+; ==================================================================	
+os_status_a20:
+	mov ax, 2402h
+	int 15h
+	ret
