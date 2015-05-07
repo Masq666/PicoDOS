@@ -1,0 +1,33 @@
+
+Structure of PicoFS
+
+Sector 1 		= Boot Sector
+Sector 2 		= 512 byte bitmap, each bit marks a sector as used or unused (MAX 4096 sectors)
+Sector 3-11 	= 8 sector Root Directory Entry
+Sector 12-End	= Data Sectors
+
+Each Directory is 8 sectors and consists of up to 127, 32 byte entries.
+The first entry is the entry containing the Directory name. Then the 127 dir entries.
+
+; 32 bytes
+struc PICOFS_ENTRY {
+    .FileName              resb 8         ; Filename
+    .FileExtension         resb 3         ; Extension
+    .Attributes            resb 1         ; Attributes
+    .CreateDateTime        resb 5         ; 5 byte date string. dd.mm.yy hh:mm (each xx represented with a byte)
+	.ModifyDateTime		   resb 5		  ; yy is number of years since 1980 (MAX year: 2235)
+	.Reserved			   resb 2
+    .FirstClusterLow       resb 4         ; First Logical Cluster
+    .Size                  resb 4         ; File Size (in bytes)
+} 
+
+ Attributes:
+ BIT   MASK    ATTRIBUTE
+ 0     01h     Read-only
+ 1     02h     Hidden
+ 2     04h     System
+ 3     08h     Volume Label		
+ 4     10h     Subdirectory
+ 5     20h     Archive
+ 6     40h     Unused
+ 7     80h     Unused       
