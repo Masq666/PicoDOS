@@ -6,6 +6,7 @@
 ;
 ; Functions:
 ;	os_pause		       	  - Delay execution for specified 110ms chunks
+;	os_reboot 				  - Reboots the system
 ;	os_fatal_error		      - Display error message and halt execution
 ;	os_missing_mikeos	      - Does nothing, unimplemented MikeOS calls ends up here
 ; ==================================================================
@@ -68,6 +69,18 @@ os_pause:
 	.orig_req_delay 	dw	0
 	.counter_var		dw	0
 	.prev_tick_count	dw	0
+
+; ==================================================================
+; os_reboot - Reboots the system
+;
+; IN: Nothing
+;
+; OUT: Nothing
+; ==================================================================	
+os_reboot:
+       db 0xea			; Machine language to jump to
+       dw 0x0000		; address FFFF:0000 (reboot)
+       dw 0xffff		; we're rebooting!
 
 ; ==================================================================
 ; os_fatal_error - Display error message and halt execution
