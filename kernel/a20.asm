@@ -7,6 +7,7 @@
 ; Functions:
 ;	os_enable_a20	       	  - Enable the A20 Gate using the BIOS
 ;	os_disable_a20 			  - Disable the A20 Gate using the BIOS
+;	os_status_a20 			  - Check A20 Gate Status
 ; ==================================================================
 
 ; ==================================================================
