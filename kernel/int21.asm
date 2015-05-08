@@ -2,53 +2,32 @@
 ; PicoDOS -- A Minimalistic DOS Clone
 ; Copyright (C) 2014 - 2015 PicoDOS Developers
 ;
-; DOS INTERRUPT ROUTINES
+; INTERRUPT HANDLERS
 ;
 ; Functions:
 ;	os_install_interrupts
-;	int20
+;	int20							- Is handled by int21 func 4C
 ;	int21
+;	int29
 ; ==================================================================
 os_install_interrupts:
-	push  ds			    ; Save DS
-	cli				    ; Turn off int's
+	push  ds			    		; Save DS
+	cli				    			; Turn off int's
 	xor   ax, ax
-	mov   ds, ax			    ; 0 DS
-	mov   word [ds:20h*4],int20	    ; load int vecter with int20h address
+	mov   ds, ax			    	; 0 DS
+	mov   word [ds:20h*4],int20	    ; load int vector with int20h address
 	mov   word [ds:20h*4+2],cs	    ; + CS
 
-	mov   word [ds:21h*4],int21	    ; load int vecter with int21h address
+	mov   word [ds:21h*4],int21	    ; load int vector with int21h address
 	mov   word [ds:21h*4+2],cs	    ; + CS
-	sti				    ; Turn on int's
-	pop   ds			    ; restore DS
-	ret				    ; Return
-; ==================================================================
-;  INT 20h Terminate .COM program.
-; ==================================================================
-old_int20:					; Int 20h ends up here.
-	cli				    	; Turn off int's
-	push  cs			    ; Push CS on stack
-	pop   bx			    ; BX now = CS   
-	mov   ds,bx			    ; Move BX into DS
-	mov   es,bx			    ; Move BX into ES
-	mov   ss,bx			    ; Move BX into SS
-	xor   sp,sp			    ; 0 SP
-	sti				    	; Turn on int's
-	cmp   ah,'R'			    ; Check for a 'R'(read error) in AH
-	je    ReadError 		    ; Jump if =.
-	cmp   al,'F'			    ; Check for a 'F'(read error) in AL
-	je    FindError 		    ; Jump if =.
-	jmp   Start2			    ; If not jump to label Start2 
-FindError:
-	mov   si,FindMsg		    ; Point SI to find error message.
-	call  os_print_string		    ; Call print funtion.
-;	 call  Aprompt			     ; Call prompt funtion.
-	jmp   os_main			    ; If not jump to label os_main
-ReadError:
-	mov   si,ReadMsg		    ; Point SI to read error message.
-	call  os_print_string		    ; Call print funtion.
-;	 call  Aprompt			     ; Call prompt funtion.
-	jmp   os_main			    ; If not jump to label MainLoop
+	
+	mov   word [ds:29h*4],int29	    ; load int vector with int29h address
+	mov   word [ds:29h*4+2],cs	    ; + CS
+	
+	sti				    			; Turn on int's
+	pop   ds			    		; restore DS
+	ret				    			; Return
+
 ; ==================================================================
 ; INT 21h Jump Table
 ; ==================================================================
@@ -135,40 +114,14 @@ int21:
 	include "kernel/int21/func_4B.asm"  ; 4Bh - LOAD AND/OR EXECUTE PROGRAM
 	include "kernel/int21/func_4C.asm"  ; 4Ch - "EXIT" - TERMINATE WITH RETURN CODE
 	include "kernel/int21/func_4D.asm"  ; 4Dh - GET RETURN CODE (ERRORLEVEL)
-;====================================================;
-;  terminate program				     ;
-;====================================================; 
-old_int21_00:
-	jmp   int20			   ; Jump to int20 label
-; ------------------------------------------------------------------
-; int21 Func 06h -- Direct console output
-; IN: DL = character (except FFh); OUT: AL = Character output
-;int21_06:
-;	 cmp dl, 255
-;	 je int21_07
-;	 jmp int21_02
-;====================================================;
-;  read character without echo			     ;
-;====================================================; 
-;int21_07:
-;	 xor   ax,ax			    ; 0 AX
-;	 int   16h			    ; Call BIOS function.
-;	 iret
-;====================================================;
-;  get current drive				     ;
-;====================================================; 
-;int21_19:
-;	 mov   al,byte[cs:bootdev]	; Move boot drive number into AL
-;	 iret
-;====================================================;
-;  Get date					     ;
-;====================================================; 
-;int21_2A:
-;====================================================;
-;  Set date					     ;
-;====================================================; 
-;int21_2B:
-;	  jmp	int21_error		     ; Jump to int21_error label,as function not implemented
+	
+; ==================================================================
+; INT 29h Handler - Fast Console Output
+; ==================================================================
+int29:
+	call os_print_char		    ; Call our print char function
+	iret
+
 ;====================================================;
 ; alloc ram memory				     ;
 ;====================================================; 
@@ -183,11 +136,7 @@ int21_48:
 	sub   bx, word [cs:end_memory]	   ; Show what memory is available.
 	stc				   ; Set CF ti 1
 	jmp   int21_error		   ; Jump to int21_error label
-;====================================================;
-; End program					     ;
-;====================================================; 
-old_int21_4C:
-	jmp   int20			   ; Jump to int20   label
+
 ;====================================================;
 ; int21 error					     ;
 ;====================================================; 
@@ -198,8 +147,3 @@ int21_error:
 	; ---
 
 	mov   ax,0xffff 		   ; Move AX 0xFFFF to show error
-;====================================================;
-; int21 exit					     ;
-;====================================================;
-;int21_exit:
-;	 iret				    ; Int return.
