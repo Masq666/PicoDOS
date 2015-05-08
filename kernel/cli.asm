@@ -5,8 +5,8 @@
 ; COMMAND LINE INTERFACE
 ;
 ; Functions:
-;	os_command_line 	      - Clears screen and prints welcome message
-;	get_cmd 		      - Parses CMD input
+;	os_command_line 	      - Prints welcome message
+;	get_cmd 		      	  - Parses CMD input
 ;
 ; Todo:
 ;	* Support for ENV variables, PATH etc...
@@ -122,9 +122,16 @@ get_cmd:				    	; Main processing loop
 	call os_string_compare
 	jc near size_file
 
+	mov di, s_cli_mem		; 'MEM' entered?
+	call os_string_compare
+	jc near os_cli_mem
 
+	mov di, s_cli_reboot	; 'REBOOT' entered?
+	call os_string_compare
+	jc near os_reboot
+	
 	; If the user hasn't entered any of the above commands, then we
-	; need to check for an executable file -- .BIN or .BAS, and the
+	; need to check for an executable file -- .BIN, .COM or .EXE, and the
 	; user may not have provided the extension
 
 	mov ax, command
@@ -573,11 +580,10 @@ ren_file:
 	.failure_msg	db 'Operation failed - file not found or invalid filename', 13, 10, 0
 
 
-; ------------------------------------------------------------------
-
-;exit:
-;	 ret
-
+; ==================================================================
+; INCLUDES
+; ==================================================================
+	include "kernel/commands/mem.asm"	; MEM Command
 
 ; ==================================================================
 ; DATA
@@ -616,6 +622,7 @@ ren_file:
 	dir_string		db 'DIR', 0
 	;time_string		 db 'TIME', 0
 	;date_string		 db 'DATE', 0
+
 	ver_string		db 'VER', 0
 	cat_string		db 'CAT', 0		; Should be an external app
 	del_string		db 'DEL', 0		; Should be an external app
@@ -623,6 +630,9 @@ ren_file:
 	copy_string		db 'COPY', 0		; Should be an external app
 	size_string		db 'SIZE', 0		; Merge with DIR
 	testzone_string db 'TESTZONE', 0	; TEST Zone
+
+	s_cli_mem		db 'MEM', 0	
+	s_cli_reboot	db 'REBOOT', 0
 
 	help_text	db 13, 10,'Supported commands:', 13, 10
 				db 'CAT       Print content of file', 13, 10
@@ -632,6 +642,8 @@ ren_file:
 				db 'DEL       Delete file', 13, 10
 				db 'DIR       Lists all files and subfolders in a directory', 13, 10
 				db 'DUMP      Dump registers to screen', 13, 10
+				db 'MEM       Display memory information', 13, 10
+				db 'REBOOT    Reboot PC', 13, 10
 				db 'REN       Rename file', 13, 10
 				db 'SIZE      Display file size', 13, 10
 				db 'TIME      Displays current time', 13, 10
