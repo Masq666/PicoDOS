@@ -78,13 +78,13 @@ get_cmd:				    	; Main processing loop
 	call os_string_compare
 	jc near testzone
 
-	mov di, s_cli_help		; 'HELP' entered?
+	mov di, s_cli_help			; 'HELP' entered?
 	call os_string_compare
 	jc near os_cli_help
 
-	mov di, cls_string		; 'CLS' entered?
+	mov di, s_cli_cls			; 'CLS' entered?
 	call os_string_compare
-	jc near clear_screen
+	jc near os_cli_cls
 
 	mov di, dir_string		; 'DIR' entered?
 	call os_string_compare
@@ -263,15 +263,6 @@ total_fail:
 	jmp get_cmd
 
 ; ==================================================================
-; INTERNAL COMMAND
-; CLS - Clear Screen
-; ==================================================================
-clear_screen:
-	call os_clear_screen
-	jmp get_cmd
-
-
-; ------------------------------------------------------------------
 
 ;print_time:
 	;mov bx, tmp_string
@@ -574,6 +565,7 @@ ren_file:
 ; ==================================================================
 ; INCLUDES
 ; ==================================================================
+	include "kernel/commands/cls.asm"	; CLS Command
 	include "kernel/commands/mem.asm"	; MEM Command
 	include "kernel/commands/help.asm"	; HELP Command
 
@@ -610,7 +602,6 @@ ren_file:
 	dump_string		db 'DUMP', 0
 	;exit_string		 db 'EXIT', 0
 	
-	cls_string		db 'CLS', 0
 	dir_string		db 'DIR', 0
 	;time_string		 db 'TIME', 0
 	;date_string		 db 'DATE', 0
@@ -626,6 +617,7 @@ ren_file:
 ; ==================================================================
 ; INTERNAL COMMANDS
 ; ==================================================================
+	s_cli_cls		db 'CLS', 0
 	s_cli_help		db 'HELP', 0
 	s_cli_mem		db 'MEM', 0	
 	s_cli_reboot	db 'REBOOT', 0
