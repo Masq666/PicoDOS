@@ -128,7 +128,7 @@ get_cmd:				    	; Main processing loop
 
 	mov di, s_cli_reboot		; 'REBOOT' entered?
 	call os_string_compare
-	jc near os_reboot
+	jc near os_cli_reboot
 	
 	; If the user hasn't entered any of the above commands, then we
 	; need to check for an executable file -- .BIN, .COM or .EXE, and the
@@ -556,10 +556,11 @@ ren_file:
 ; ==================================================================
 ; INCLUDES
 ; ==================================================================
-	include "kernel/commands/cls.asm"	; CLS Command
-	include "kernel/commands/dump.asm"	; DUMP Command
-	include "kernel/commands/help.asm"	; HELP Command
-	include "kernel/commands/mem.asm"	; MEM Command
+	include "kernel/commands/cls.asm"		; CLS Command
+	include "kernel/commands/dump.asm"		; DUMP Command
+	include "kernel/commands/help.asm"		; HELP Command
+	include "kernel/commands/mem.asm"		; MEM Command
+	include "kernel/commands/reboot.asm"	; REBOOT Command
 
 ; ==================================================================
 ; DATA
