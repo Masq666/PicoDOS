@@ -78,9 +78,9 @@ get_cmd:				    	; Main processing loop
 	call os_string_compare
 	jc near testzone
 
-	mov di, help_string		; 'HELP' entered?
+	mov di, s_cli_help		; 'HELP' entered?
 	call os_string_compare
-	jc near print_help
+	jc near os_cli_help
 
 	mov di, cls_string		; 'CLS' entered?
 	call os_string_compare
@@ -260,15 +260,6 @@ total_fail:
 	mov si, invalid_msg
 	call os_print_string
 
-	jmp get_cmd
-
-; ==================================================================
-; INTERNAL COMMAND
-; HELP - Display supported commands
-; ==================================================================
-print_help:
-	mov si, help_text
-	call os_print_string
 	jmp get_cmd
 
 ; ==================================================================
@@ -584,6 +575,7 @@ ren_file:
 ; INCLUDES
 ; ==================================================================
 	include "kernel/commands/mem.asm"	; MEM Command
+	include "kernel/commands/help.asm"	; HELP Command
 
 ; ==================================================================
 ; DATA
@@ -617,7 +609,7 @@ ren_file:
 
 	dump_string		db 'DUMP', 0
 	;exit_string		 db 'EXIT', 0
-	help_string		db 'HELP', 0
+	
 	cls_string		db 'CLS', 0
 	dir_string		db 'DIR', 0
 	;time_string		 db 'TIME', 0
@@ -631,21 +623,11 @@ ren_file:
 	size_string		db 'SIZE', 0		; Merge with DIR
 	testzone_string db 'TESTZONE', 0	; TEST Zone
 
+; ==================================================================
+; INTERNAL COMMANDS
+; ==================================================================
+	s_cli_help		db 'HELP', 0
 	s_cli_mem		db 'MEM', 0	
 	s_cli_reboot	db 'REBOOT', 0
 
-	help_text	db 13, 10,'Supported commands:', 13, 10
-				db 'CAT       Print content of file', 13, 10
-				db 'CLS       Clears the screen', 13, 10
-				db 'COPY      Copy file to another location', 13, 10
-				db 'DATE      Displays current date', 13, 10
-				db 'DEL       Delete file', 13, 10
-				db 'DIR       Lists all files and subfolders in a directory', 13, 10
-				db 'DUMP      Dump registers to screen', 13, 10
-				db 'MEM       Display memory information', 13, 10
-				db 'REBOOT    Reboot PC', 13, 10
-				db 'REN       Rename file', 13, 10
-				db 'SIZE      Display file size', 13, 10
-				db 'TIME      Displays current time', 13, 10
-				db 'VER       Display PicoDOS version number', 13, 10, 0
 ; ==================================================================
