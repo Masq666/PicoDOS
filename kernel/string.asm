@@ -38,7 +38,7 @@ os_string_length:
 	xor cx, cx			; Counter CX = 0
 
 .more:
-	cmp byte [bx], 0		; Zero (end of string) yet?
+	cmp byte [bx], 0	; Zero (end of string) yet?
 	je .done
 	inc bx				; If not, keep adding
 	inc cx
@@ -446,12 +446,8 @@ os_string_strip:
 ; OUT: String modified, registers preserved
 ; ==================================================================
 os_string_truncate:
-	push ax
-
 	add si, ax
 	mov byte [si], 0
-
-	pop ax
 	ret
 
 ; ==================================================================
