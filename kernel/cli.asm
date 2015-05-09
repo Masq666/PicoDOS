@@ -70,9 +70,9 @@ get_cmd:				    	; Main processing loop
 
 	mov si, input
 
-	mov di, dump_string		; 'DUMP' entered?
+	mov di, s_cli_dump			; 'DUMP' entered?
 	call os_string_compare
-	jc near dump
+	jc near os_cli_dump
 
 	mov di, testzone_string 	; 'TESTZONE' entered?
 	call os_string_compare
@@ -90,7 +90,7 @@ get_cmd:				    	; Main processing loop
 	call os_string_compare
 	jc near list_directory
 
-	mov di, ver_string		; 'VER' entered?
+	mov di, s_cli_ver			; 'VER' entered?
 	call os_string_compare
 	jc near print_ver
 
@@ -102,31 +102,31 @@ get_cmd:				    	; Main processing loop
 ;	 call os_string_compare
 ;	 jc near print_date
 
-	mov di, cat_string		; 'CAT' entered?
+	mov di, cat_string			; 'CAT' entered?
 	call os_string_compare
 	jc near cat_file
 
-	mov di, del_string		; 'DEL' entered?
+	mov di, del_string			; 'DEL' entered?
 	call os_string_compare
 	jc near del_file
 
-	mov di, copy_string		; 'COPY' entered?
+	mov di, copy_string			; 'COPY' entered?
 	call os_string_compare
 	jc near copy_file
 
-	mov di, ren_string		; 'REN' entered?
+	mov di, ren_string			; 'REN' entered?
 	call os_string_compare
 	jc near ren_file
 
-	mov di, size_string		; 'SIZE' entered?
+	mov di, size_string			; 'SIZE' entered?
 	call os_string_compare
 	jc near size_file
 
-	mov di, s_cli_mem		; 'MEM' entered?
+	mov di, s_cli_mem			; 'MEM' entered?
 	call os_string_compare
 	jc near os_cli_mem
 
-	mov di, s_cli_reboot	; 'REBOOT' entered?
+	mov di, s_cli_reboot		; 'REBOOT' entered?
 	call os_string_compare
 	jc near os_reboot
 	
@@ -282,15 +282,6 @@ total_fail:
 	;call os_print_string
 	;call os_print_newline
 ;	 jmp get_cmd
-
-
-; ==================================================================
-; INTERNAL COMMAND
-; DUMP - Dump Registers to STDOUT
-; ==================================================================
-dump:
-	call os_dump_registers
-	jmp get_cmd
 
 ; ==================================================================
 ; INTERNAL COMMAND
@@ -566,8 +557,9 @@ ren_file:
 ; INCLUDES
 ; ==================================================================
 	include "kernel/commands/cls.asm"	; CLS Command
-	include "kernel/commands/mem.asm"	; MEM Command
+	include "kernel/commands/dump.asm"	; DUMP Command
 	include "kernel/commands/help.asm"	; HELP Command
+	include "kernel/commands/mem.asm"	; MEM Command
 
 ; ==================================================================
 ; DATA
@@ -599,14 +591,12 @@ ren_file:
 	welcome_msg		db 'Welcome to PicoDOS ',PICO_VER, 13, 10, 0
 	version_msg		db 13, 10,'PicoDOS [Version ',PICO_VER,']',13,10,0
 
-	dump_string		db 'DUMP', 0
-	;exit_string		 db 'EXIT', 0
+	;dump_string		db 'DUMP', 0
 	
 	dir_string		db 'DIR', 0
 	;time_string		 db 'TIME', 0
 	;date_string		 db 'DATE', 0
 
-	ver_string		db 'VER', 0
 	cat_string		db 'CAT', 0		; Should be an external app
 	del_string		db 'DEL', 0		; Should be an external app
 	ren_string		db 'REN', 0		; Should be an external app
@@ -618,8 +608,10 @@ ren_file:
 ; INTERNAL COMMANDS
 ; ==================================================================
 	s_cli_cls		db 'CLS', 0
+	s_cli_dump		db 'DUMP', 0
 	s_cli_help		db 'HELP', 0
 	s_cli_mem		db 'MEM', 0	
 	s_cli_reboot	db 'REBOOT', 0
+	s_cli_ver		db 'VER', 0
 
 ; ==================================================================
