@@ -57,7 +57,7 @@ os_call_vectors:
 	jmp   os_string_truncate	    ; 004Eh - Chop string down to specified number of characters
 	jmp   os_bcd_to_int				; 0051h
 	jmp   os_missing_mikeos 	    ; 0054h - os_get_time_string
-	jmp   os_missing_mikeos 	    ; 0057h - os_get_api_version
+	jmp   os_get_api_version 	    ; 0057h - Return current version of MikeOS API
 	jmp   os_missing_mikeos 	    ; 005Ah - os_file_selector
 	jmp   os_missing_mikeos 	    ; 005Dh - os_get_date_string
 	jmp   os_send_via_serial	    ; 0060h
@@ -65,7 +65,7 @@ os_call_vectors:
 	jmp   os_find_char_in_string	; 0066h - Find location of character in a string
 	jmp   os_get_cursor_pos 	    ; 0069h
 	jmp   os_print_space		    ; 006Ch - Print a space to the screen
-	jmp   os_dump_string	 	    ; 006Fh - os_dump_string
+	jmp   os_dump_string	 	    ; 006Fh - Dump string as hex bytes and printable characters
 	jmp   os_print_digit		    ; 0072h - Displays contents of AX as a single digit
 	jmp   os_print_1hex				; 0075h - Displays low nibble of AL in hex format
 	jmp   os_print_2hex				; 0078h - Displays AL in hex format

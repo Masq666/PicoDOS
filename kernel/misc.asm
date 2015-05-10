@@ -11,10 +11,20 @@
 ;	os_missing_mikeos	      - Does nothing, unimplemented MikeOS calls ends up here
 ; ==================================================================
 
-
+	MIKEOS_API_VER 16			; API version for programs to check
+	
+; ==================================================================
+; os_get_api_version - Return current version of MikeOS API
+;
+; IN: Nothing 
+; OUT: AL = API version number
+; ==================================================================
+os_get_api_version:
+	mov al, MIKEOS_API_VER
+	ret
 
 ; ==================================================================
-; os_pause -- Delay execution for specified 110ms chunks
+; os_pause - Delay execution for specified 110ms chunks
 ;
 ; IN: AX = 100 millisecond chunks to wait (max delay is 32767,
 ;     which multiplied by 55ms = 1802 seconds = 30 minutes)
