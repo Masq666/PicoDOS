@@ -6,33 +6,8 @@
 ;
 ; ==================================================================
 
-;CommandBuffer: times  128  db 0
-;CommandBufHist: times	128  db 0
-;RootConvertedFileName: times 20 db 0
-
-mes		db 'Welcome to PicoDOS ',PICO_VER, 13, 10, 0
-
-;Prompt 	 db 13, 10,'A:\', 0
-;halt_msg	 db 13, 10, 'End of program.', 13, 10, 0
-reboot_msg	db 13, 10, 'Press any key to reboot...', 0
-ReadMsg 	db 'Read disk error!', 13, 10, 0
-FindMsg 	db 'Bad command or file name', 13, 10, 0
-WrongExtMsg	db 13, 10,'PicoDOS can only load exe or com files ', 13, 10, 0
-
-
-;HelpMsg	 db 13, 10,'Supported commands:', 13, 10
-;		 db 'CLS       Clears the screen', 13, 10
-;		 db 'DATE      Displays current date', 13, 10
-;		 db 'DIR       Lists all files and subfolders in a directory', 13, 10
-;		 db 'TIME      Displays current time', 13, 10
-;		 db 'REBOOT    Reboots the PC', 13, 10, 0
-
-;VerMsg 	 db 13, 10,'PicoDOS [Version ',PICO_VER,']',13,10,0
-
-Disabled	db 'Disabled!', 13, 10, 0
-NotSup 		db 'Not Supported!', 13, 10, 0
-
 ERRORLEVEL	db 0			    ; Return code from program
+
 ; ==================================================================
 ; DATA STRUCTURES
 ; ==================================================================
