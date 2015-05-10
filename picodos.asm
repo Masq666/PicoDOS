@@ -9,13 +9,13 @@
 ; ==================================================================
 
 format binary as "sys"			; File will be assembled to picodos.sys
-use16						; 16bit addressing
+use16							; 16bit addressing
 org 0
 
 disk_buffer	equ	24576		    ; 8K disk buffer starts at this offset.
 								; 0	- 24575 Kernel Space			24K
 								; 24576 - 32767 Disk Buffer			8K
-								; 32768 - 65536 Application Space (.BIN and .PTE)	32K
+								; 32768 - 65536 Application Space (.BIN)	32K
 ; ------------------------------------------------------------------
 ; OS CALL VECTORS -- Static locations for system call vectors
 ; Note: these cannot be moved, or it'll break the calls!
@@ -26,8 +26,7 @@ disk_buffer	equ	24576		    ; 8K disk buffer starts at this offset.
 ; in the kernel source code. Each jmp instruction takes 3 bytes.
 
 ; This list will be as compatible with MikeOS as possible.
-; Direct system calls can only be used by .bin or .pte files,
-; and have a max size of 32Kb.
+; Direct system calls can only be used by .bin files, and have a max size of 32Kb.
 os_call_vectors:
 	jmp   os_boot					; 0000h - Jump to label os_boot
 	jmp   os_print_string		    ; 0003h - Write Sting to STDOUT
@@ -40,8 +39,8 @@ os_call_vectors:
 	jmp   os_int_to_string		    ; 0018h
 	jmp   os_missing_mikeos 	    ; 001Bh - os_speaker_tone
 	jmp   os_missing_mikeos 	    ; 001Eh - os_speaker_off
-	jmp   os_load_file			; 0021h
-	jmp   os_pause				; 0024h
+	jmp   os_load_file				; 0021h
+	jmp   os_pause					; 0024h
 	jmp   os_fatal_error		    ; 0027h
 	jmp   os_missing_mikeos 	    ; 002Ah - os_draw_background
 	jmp   os_string_length		    ; 002Dh
@@ -56,7 +55,7 @@ os_call_vectors:
 	jmp   os_string_chomp		    ; 0048h
 	jmp   os_string_strip		    ; 004Bh - Removes specified character from a string (max 255 chars)
 	jmp   os_string_truncate	    ; 004Eh - Chop string down to specified number of characters
-	jmp   os_bcd_to_int			; 0051h
+	jmp   os_bcd_to_int				; 0051h
 	jmp   os_missing_mikeos 	    ; 0054h - os_get_time_string
 	jmp   os_missing_mikeos 	    ; 0057h - os_get_api_version
 	jmp   os_missing_mikeos 	    ; 005Ah - os_file_selector
@@ -68,9 +67,9 @@ os_call_vectors:
 	jmp   os_print_space		    ; 006Ch - Print a space to the screen
 	jmp   os_missing_mikeos 	    ; 006Fh - os_dump_string
 	jmp   os_print_digit		    ; 0072h - Displays contents of AX as a single digit
-	jmp   os_print_1hex			; 0075h - Displays low nibble of AL in hex format
-	jmp   os_print_2hex			; 0078h - Displays AL in hex format
-	jmp   os_print_4hex			; 007Bh - Displays AX in hex format
+	jmp   os_print_1hex				; 0075h - Displays low nibble of AL in hex format
+	jmp   os_print_2hex				; 0078h - Displays AL in hex format
+	jmp   os_print_4hex				; 007Bh - Displays AX in hex format
 	jmp   os_missing_mikeos 	    ; 007Eh - os_long_int_to_string
 	jmp   os_missing_mikeos 	    ; 0081h - os_long_int_negate
 	jmp   os_missing_mikeos 	    ; 0084h - os_set_time_fmt
@@ -79,7 +78,7 @@ os_call_vectors:
 	jmp   os_missing_mikeos 	    ; 008Dh - os_hide_cursor
 	jmp   os_dump_registers 	    ; 0090h
 	jmp   os_string_strincmp	    ; 0093h
-	jmp   os_write_file			; 0096h
+	jmp   os_write_file				; 0096h
 	jmp   os_file_exists		    ; 0099h
 	jmp   os_create_file		    ; 009Ch
 	jmp   os_remove_file		    ; 009Fh
@@ -104,16 +103,16 @@ os_call_vectors:
 	MikeOS_Sys_Calls: times 30 db 0     ; Room Reserved for an additional 10 future MikeOS System Calls
 	;--- PicoDOS spesific System Calls ---
 	
-	jmp   os_print_8hex			; 00F0h - Displays EAX in hex format
+	jmp   os_print_8hex				; 00F0h - Displays EAX in hex format
 	jmp   os_send_string_via_serial ; 00F3h - Send a string via the serial port
 	jmp   os_set_serial_port	    ; 00F6h - Set port to use (00h-03h)
 	jmp   os_byte_to_bcd		    ; 00F9h - Converts a byte to a binary coded decimal number
 	jmp   os_memcpy 			    ; 00FCh - Copy bytes in memory to another location
 	jmp   os_memset 			    ; 00FFh - Fill block of memory
-					    ; 0102h -
+									; 0102h -
 ; ------------------------------------------------------------------
 ; Change these params to fake DOS version number, 6.22 for example.
-	PICO_VER	equ  "1.0"	    ; PicoDOS Version String.
+	PICO_VER	equ  "1.01"	    ; PicoDOS Version String.
 	PICO_VER_HI	=  5		    ; Set hi part of version
 	PICO_VER_LO	=  0		    ; Set lo part of version
 	PICO_VER_NR	=  0500h	    ; This is the one used by int21 - 30h
@@ -157,7 +156,7 @@ os_boot:
 
 .no_change:
 
-	call  os_install_interrupts	; Install DOS Interrupt Functions
+	call  os_install_interrupts	; Install Interrupt Services
 
 	xor   ax, ax			    ; Use COM1 9600 bps AX = 0
 	call  os_serial_port_enable	; System is now ready for serial communication
@@ -189,7 +188,7 @@ os_main:
 	include "kernel/misc.asm"	    ; Misc functions
 	include "kernel/memory.asm"	    ; Memory functions
 
-	include "test.asm"			; TESTZONE!
+	include "test.asm"				; TESTZONE!
 ; ==================================================================
 ; DATA
 ; ==================================================================
@@ -200,8 +199,8 @@ os_main:
 	SaveCS		dw 0
 
 	;KRNL_SEG	dw 0050h
-	COM_LOAD	dw 1060h			; We Load COM/EXE at this segment, 67K from memory start.
-									; the Kernel is loaded before this.
+	COM_LOAD	dw 0860h			; We Load COM/EXE at this segment, 67K from memory start.
+									; the Kernel is loaded before this. 
 
 	include "kernel/Data.inc"	    ; Data include files
 

@@ -74,7 +74,7 @@ get_cmd:				    	; Main processing loop
 	call os_string_compare
 	jc near os_cli_dump
 
-	mov di, testzone_string 	; 'TESTZONE' entered?
+	mov di, s_cli_testzone	 	; 'TESTZONE' entered?
 	call os_string_compare
 	jc near testzone
 
@@ -163,7 +163,9 @@ get_cmd:				    	; Main processing loop
 
 	jmp no_extension
 
-
+; ==================================================================
+; EXECUTE MikeOS .BIN executable
+; ==================================================================
 bin_file:
 	mov ax, command
 	mov bx, 0
@@ -172,35 +174,46 @@ bin_file:
 	jc total_fail
 
 execute_bin:
-	xor ax, ax			; Clear all registers
+	xor ax, ax					; Clear all registers
 	xor bx, bx
 	xor cx, cx
 	xor dx, dx
 	mov word si, [param_list]
 	mov di, 0
 
-	call 32768			; Call the external program
+	call 32768					; Call the external program
 
-	jmp get_cmd			; When program has finished, start again
+	jmp get_cmd					; When program has finished, start again
 
-
+; ==================================================================
+; EXECUTE DOS .COM Executables
+; ==================================================================
 execute_com:
 	mov ax, command
 	mov bx, 0
-	mov cx, 32768
+	mov cx, 8100h
 	call os_load_file
 	jc total_fail
+	
+	cli							; We need to prevent Interrupts while changing segments
+	mov ax, [COM_LOAD]			; We're loading .COM at segment 0860h
+	mov	es, ax	
 
-	xor ax, ax			; Clear all registers
-	xor bx, bx
-	xor cx, cx
-	xor dx, dx
-	mov word si, [param_list]
-	mov di, 0
+	 
+	sub	ax, 10h 				; "org 100h" stuff :)
+	mov	es, ax
+	mov	ds, ax
+	mov	ss, ax
+	xor	sp, sp
 
-	call 32768			; Call the external program
-	jmp get_cmd			; Do nothing for now
-
+	push 0x0010					; Points to int20 function
+	push es
+	push word 100h
+	
+	sti							; Turn Interrupts on again
+	retf						; Make a far jump into application
+	jmp $
+	
 no_extension:
 	;mov ax, command
 	;call os_string_length
@@ -591,8 +604,6 @@ ren_file:
 
 	welcome_msg		db 'Welcome to PicoDOS ',PICO_VER, 13, 10, 0
 	version_msg		db 13, 10,'PicoDOS [Version ',PICO_VER,']',13,10,0
-
-	;dump_string		db 'DUMP', 0
 	
 	dir_string		db 'DIR', 0
 	;time_string		 db 'TIME', 0
@@ -603,7 +614,6 @@ ren_file:
 	ren_string		db 'REN', 0		; Should be an external app
 	copy_string		db 'COPY', 0		; Should be an external app
 	size_string		db 'SIZE', 0		; Merge with DIR
-	testzone_string db 'TESTZONE', 0	; TEST Zone
 
 ; ==================================================================
 ; INTERNAL COMMANDS
@@ -613,6 +623,7 @@ ren_file:
 	s_cli_help		db 'HELP', 0
 	s_cli_mem		db 'MEM', 0	
 	s_cli_reboot	db 'REBOOT', 0
+	s_cli_testzone	db 'TESTZONE', 0
 	s_cli_ver		db 'VER', 0
 
 ; ==================================================================
