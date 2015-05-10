@@ -65,7 +65,7 @@ os_call_vectors:
 	jmp   os_find_char_in_string	; 0066h - Find location of character in a string
 	jmp   os_get_cursor_pos 	    ; 0069h
 	jmp   os_print_space		    ; 006Ch - Print a space to the screen
-	jmp   os_missing_mikeos 	    ; 006Fh - os_dump_string
+	jmp   os_dump_string	 	    ; 006Fh - os_dump_string
 	jmp   os_print_digit		    ; 0072h - Displays contents of AX as a single digit
 	jmp   os_print_1hex				; 0075h - Displays low nibble of AL in hex format
 	jmp   os_print_2hex				; 0078h - Displays AL in hex format

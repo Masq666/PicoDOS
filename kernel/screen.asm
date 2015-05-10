@@ -99,8 +99,8 @@ os_print_newline:
 os_print_space:
 	push ax
 
-	mov ax, 0E20h			 ; BIOS teletype function
-	int 10h 			 ; Space is character 20h
+	mov ax, 0E20h			; BIOS teletype function
+	int 10h 			 	; Space is character 20h
 
 	pop ax
 	ret
@@ -112,13 +112,13 @@ os_print_space:
 os_clear_screen:
 	pusha
 
-	xor dx, dx			; Position cursor at top-left DX = 0
+	xor dx, dx				; Position cursor at top-left DX = 0
 	call os_move_cursor
 
 	mov ax, 0600h			; Scroll full-screen
-					; Normal white on black
-	mov bh, 7			;
-	xor cx, cx			; Top-left CX = 0
+							; Normal white on black
+	mov bh, 7				;
+	xor cx, cx				; Top-left CX = 0
 	mov dx, 184Fh			; Bottom-right
 	int 10h
 
@@ -250,6 +250,85 @@ os_input_string:
 .done:
 	xor ax, ax
 	stosb
+
+	popa
+	ret
+	
+; ==================================================================
+; os_dump_string - Dump string as hex bytes and printable characters
+;
+; IN: SI = points to string to dump
+;
+; OUT: Nothing
+; ==================================================================
+os_dump_string:
+	pusha
+
+	mov bx, si			; Save for final print
+
+.line:
+	mov di, si			; Save current pointer
+	mov cx, 0			; Byte counter
+
+.more_hex:
+	lodsb
+	cmp al, 0
+	je .chr_print
+
+	call os_print_2hex
+	call os_print_space		; Single space most bytes
+	inc cx
+
+	cmp cx, 8
+	jne .q_next_line
+
+	call os_print_space		; Double space centre of line
+	jmp .more_hex
+
+.q_next_line:
+	cmp cx, 16
+	jne .more_hex
+
+.chr_print:
+	call os_print_space
+	mov ah, 0Eh			; BIOS teletype function
+	mov al, '|'			; Break between hex and character
+	int 10h
+	call os_print_space
+
+	mov si, di			; Go back to beginning of this line
+	mov cx, 0
+
+.more_chr:
+	lodsb
+	cmp al, 0
+	je .done
+
+	cmp al, ' '
+	jae .tst_high
+
+	jmp short .not_printable
+
+.tst_high:
+	cmp al, '~'
+	jbe .output
+
+.not_printable:
+	mov al, '.'
+
+.output:
+	mov ah, 0Eh
+	int 10h
+
+	inc cx
+	cmp cx, 16
+	jl .more_chr
+
+	call os_print_newline		; Go to next line
+	jmp .line
+
+.done:
+	call os_print_newline		; Go to next line
 
 	popa
 	ret
