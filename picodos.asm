@@ -121,12 +121,6 @@ os_call_vectors:
 ; START OF MAIN KERNEL CODE
 ; ==================================================================
 os_boot:
-	;mov   [SaveNameAddress],dx	     ; Save the address of file to load from bootloader
-	;mov   [SaveCS],ax		     ; Save its CS
-	;push  cs			     ; Push CS on stack
-	;pop   ds			     ; Move CS into DS
-	;push  ds			     ; Push DS
-	;pop   es			     ; Move DS into ES
 	cli				    		; Clear interrupts
 
 	xor   ax, ax			    ; AX = 0
@@ -187,6 +181,7 @@ os_main:
 	include "kernel/vfs.asm"	    ; Virtual Filesystem
 	include "kernel/misc.asm"	    ; Misc functions
 	include "kernel/memory.asm"	    ; Memory functions
+	include "kernel/vga.asm"	    ; VGA Graphics functions
 
 	include "test.asm"				; TESTZONE!
 ; ==================================================================
@@ -195,12 +190,9 @@ os_main:
 	top_memory	dw 0
 	end_memory	dw 0
 
-	SaveNameAddress dw 0
-	SaveCS		dw 0
-
 	;KRNL_SEG	dw 0050h
-	COM_LOAD	dw 0860h			; We Load COM/EXE at this segment, 67K from memory start.
-									; the Kernel is loaded before this. 
+	COM_LOAD	dw 0860h			; We Load COM/EXE at this segment, 34K from memory start.
+									; Loaded at same spot as MikeOS .BIN files +256bytes for PSP
 
 	include "kernel/Data.inc"	    ; Data include files
 
