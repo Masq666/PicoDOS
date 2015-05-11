@@ -8,13 +8,17 @@
 ;	os_install_interrupts
 ;	int20							- Is handled by int21 func 4C
 ;	int21
-;	int29
+;	int29							- Fast Console Output
 ; ==================================================================
 os_install_interrupts:
 	push  ds			    		; Save DS
 	cli				    			; Turn off int's
 	xor   ax, ax
 	mov   ds, ax			    	; 0 DS
+
+	mov   word [ds:1Bh*4],int1B	    ; load int vector with int1Bh address
+	mov   word [ds:1Bh*4+2],cs	    ; + CS
+	
 	mov   word [ds:20h*4],int20	    ; load int vector with int20h address
 	mov   word [ds:20h*4+2],cs	    ; + CS
 
@@ -82,7 +86,7 @@ int21:
 	cmp   ah, 4Bh			    ; Does AH = 4Bh
 	je    int21_4B			    ; Load and/or execute program
 	cmp   ah, 4Ch			    ; Does AH = 0x4C
-	je    int21_4C			    ; Terminate program
+	je    int21_4C			    ; Terminate program 
 	cmp   ah, 4Dh			    ; Does AH = 4Dh
 	je    int21_4C			    ; GET RETURN CODE (ERRORLEVEL)
 	jmp int21_error
@@ -112,16 +116,21 @@ int21:
 	include "kernel/int21/func_35.asm"  ; 35h - GET INTERRUPT VECTOR
 	include "kernel/int21/func_41.asm"  ; 41h - UNLINK - DELETE FILE
 	include "kernel/int21/func_4B.asm"  ; 4Bh - LOAD AND/OR EXECUTE PROGRAM
-	include "kernel/int21/func_4C.asm"  ; 4Ch - "EXIT" - TERMINATE WITH RETURN CODE
+	include "kernel/int21/func_4C.asm"  ; 4Ch - "EXIT" - TERMINATE WITH RETURN CODE (Handles int20)
 	include "kernel/int21/func_4D.asm"  ; 4Dh - GET RETURN CODE (ERRORLEVEL)
 	
 ; ==================================================================
 ; INT 29h Handler - Fast Console Output
 ; ==================================================================
 int29:
-	call os_print_char		    ; Call our print char function
+	call  os_print_char		    ; Call our print char function
 	iret
 
+; ==================================================================
+; INT 1Bh - Control-Break Handler
+; ==================================================================
+	include "kernel/int1B/func_00.asm"
+	
 ;====================================================;
 ; alloc ram memory				     ;
 ;====================================================; 

@@ -6,7 +6,8 @@
 ;
 ; ==================================================================
 
-ERRORLEVEL	db 0			    ; Return code from program
+CONTROLC	db 0				; Will be set if crtl-c of ctrl-break is pressed.
+ERRORLEVEL	db 0			    ; Return code from program.
 
 ; ==================================================================
 ; DATA STRUCTURES
@@ -34,7 +35,9 @@ struc INPUT {
 ;
 ; The Program Segment Prefix (PSP) is a data structure used in DOS
 ; systems to store the state of a program. It resembles the Zero Page
-; in the CP/M operating system. The PSP has the following structure:
+; in the CP/M operating system. The PSP has the following structure.
+;
+; SIZE: 256 bytes
 ; ==================================================================
 struc PSP {
       .ExitCall 	     resw 1	    ; 2b  - CP/M exit (always contain INT 20h)
@@ -54,7 +57,11 @@ struc PSP {
       .Reserved2	     resd 1	    ; 4b  - Reserved
       .Version		     resw 1	    ; 2b  - DOS version to return (DOS 4 and later, alterable via SETVER in DOS 5 and later)
       .Reserved3	     resb 14	; 14b - Reserved
-
+	  .FarCallDOS		 resb 3		; 3b  - Far call to DOS (always contain INT 21h + RETF)
+	  .Reserved4		 resw 1 	; 2b  - Reserved
+	  .Reserved5		 resb 7 	; 7b  - Reserved (can be used to make first FCB into an extended FCB)
+	  .FCB1				 resb 16	; 16b - Unopened Standard FCB 1
+	  .FCB2				 resb 20	; 20b - Unopened Standard FCB 2 (overwritten if FCB 1 is opened)
       .CMD_Size 	     resb 1	    ; 1b  - Number of bytes on command-line
       .CMD		     	 resb 127	; 127b- Command-line (terminated by a 0Dh)
 }
