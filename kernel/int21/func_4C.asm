@@ -18,15 +18,23 @@ int21_4C:
 
 int21_00:
 int20:
-	cli				    ; Disable Interrupts
+	cli				    			; Disable Interrupts
 
-	push  cs			    ; Push CS on stack
-	pop   bx			    ; BX now = CS   
-	mov   ds, bx			    ; Move BX into DS
-	mov   es, bx			    ; Move BX into ES
-	mov   ss, bx			    ; Move BX into SS
-	xor   sp, sp			    ; 0 SP
+	push  cs			   			; Push CS on stack
+	pop   bx			    		; BX now = CS   
+	mov   ds, bx			    	; Move BX into DS
+	mov   es, bx			    	; Move BX into ES
+	mov   ss, bx			    	; Move BX into SS
+	xor   sp, sp			    	; 0 SP
 
-	sti				    ; Enable Interrupts
+	sti				    			; Enable Interrupts
 
-	jmp get_cmd			    ; When program has finished, return to CLI
+	cmp byte [CONTROLC], 1
+	jne .exit
+	mov si, .msg
+	call os_print_string
+	
+	.exit:
+	call get_cmd			    	; When program has finished, return to CLI
+	
+	.msg db '^C or ^Break pressed. Program terminated', 10, 13, 0
