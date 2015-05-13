@@ -70,4 +70,29 @@ os_check_for_key_status:
 	ret
 
 ; ==================================================================
+; os_check_for_ctrlc - Sets CONTROLC flag, if CTRL-C is pressed.
+;
+; IN: Nothing
+;
+; OUT: AH = 00h abort program
+;
+; NOTE: DOS will abort program with errorlevel 0
+;		This function is called from top of int 21h handler.
+; ==================================================================
+os_check_for_ctrlc:
+	push ax
+	
+	call os_check_for_key
+	cmp ax, 2E03h				; is CTRL-C pressed?
+	jz .exit
+	
+	mov byte [CONTROLC], 1		; Set CTRL-C / CTRL-Break flag.
+	pop ax
+	mov ah, 00h					; Int21 handler will call func 00h, abort program.
+	ret
+	
+.exit:
+	pop ax
+	ret
+; ==================================================================
 

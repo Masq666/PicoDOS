@@ -9,6 +9,7 @@
 ;	int20							- Is handled by int21 func 4C
 ;	int21
 ;	int29							- Fast Console Output
+;	int1B							- CTRL-Break Handler
 ; ==================================================================
 os_install_interrupts:
 	push  ds			    		; Save DS
@@ -37,6 +38,9 @@ os_install_interrupts:
 ; ==================================================================
 int21:
 	sti				    		; Int's on
+	
+	call os_check_for_ctrlc		; Check for CTRL-C
+	
 	cmp   ah, 00h			    ; Does AH = 0
 	je    int21_00			    ; Terminate program
 	cmp   ah, 01h			    ; Does AH = 1
