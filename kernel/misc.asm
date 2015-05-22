@@ -5,14 +5,71 @@
 ; MISCELLANEOUS ROUTINES
 ;
 ; Functions:
+;	os_save_regs 			  - Save all registers
 ;	os_pause		       	  - Delay execution for specified 110ms chunks
 ;	os_reboot 				  - Reboots the system
 ;	os_fatal_error		      - Display error message and halt execution
 ;	os_missing_mikeos	      - Does nothing, unimplemented MikeOS calls ends up here
 ; ==================================================================
 
-	MIKEOS_API_VER 16			; API version for programs to check
+	MIKEOS_API_VER = 16			; API version for programs to check
+
+; ==================================================================
+; os_save_regs - Save all registers
+;
+; IN: Nothing 
+; OUT: Nothing
+; ==================================================================
+os_save_regs:
+	mov [cs:OS_REG.AX], ax
+	mov [cs:OS_REG.BX], bx
+	mov [cs:OS_REG.CX], cx
+	mov [cs:OS_REG.DX], dx
 	
+	mov [cs:OS_REG.CS], cs
+	mov [cs:OS_REG.DS], ds
+	mov [cs:OS_REG.ES], es
+	mov [cs:OS_REG.SS], ss
+	mov [cs:OS_REG.FS], fs
+	mov [cs:OS_REG.GS], gs
+	
+	mov [cs:OS_REG.SI], si
+	mov [cs:OS_REG.DI], di
+	mov [cs:OS_REG.BP], bp
+	mov [cs:OS_REG.SP], sp
+	
+	ret
+
+; ==================================================================
+; os_restore_regs - Registers restored from OS_REG struct.
+;
+; IN: Nothing 
+; OUT: All registers changed
+; ==================================================================	
+os_restore_regs:
+	cli
+	;mov ax, [cs:OS_REG.AX]
+	;mov bx, [cs:OS_REG.BX]
+	;mov cx, [cs:OS_REG.CX]
+	;mov dx, [cs:OS_REG.DX]
+	
+	;xor ax, ax
+	mov ax, cs
+	;mov cs, [cs:OS_REG.CS]
+	mov ds, [cs:OS_REG.DS]
+	mov es, [cs:OS_REG.ES]
+	mov ss, ax
+	mov fs, [cs:OS_REG.FS]
+	mov gs, [cs:OS_REG.GS]
+	
+	;mov si, [cs:OS_REG.SI]
+	;mov di, [cs:OS_REG.DI]
+	;mov bp, [cs:OS_REG.BP]
+	;mov sp, [cs:OS_REG.SP]
+	;xor sp, sp
+	mov sp, os_stack+512
+	sti
+	ret
 ; ==================================================================
 ; os_get_api_version - Return current version of MikeOS API
 ;
